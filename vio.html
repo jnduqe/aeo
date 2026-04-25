@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEO Brand Voice Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --blue: #003087;
+    --gold: #f5c842;
+    --white: #ffffff;
+    --light: #f0f4ff;
+    --red: #e84040;
+    --green: #2ecc71;
+    --gray: #8892a4;
+    --card: #ffffff;
+    --shadow: 0 8px 32px rgba(0,48,135,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ===== BG DECORATION ===== */
+  .bg-deco {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-deco span {
+    position: absolute; border-radius: 50%; opacity: 0.06;
+    background: var(--gold);
+    animation: floatBg 8s ease-in-out infinite alternate;
+  }
+  .bg-deco span:nth-child(1){ width:400px;height:400px;top:-100px;left:-100px;animation-delay:0s; }
+  .bg-deco span:nth-child(2){ width:300px;height:300px;bottom:-50px;right:-80px;animation-delay:2s; }
+  .bg-deco span:nth-child(3){ width:200px;height:200px;top:40%;left:60%;animation-delay:4s;background:var(--blue);opacity:0.1; }
+  @keyframes floatBg { from{transform:scale(1) rotate(0deg);} to{transform:scale(1.3) rotate(20deg);} }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    background: rgba(0,48,135,0.95);
+    backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+    position: sticky; top: 0;
+  }
+  .topbar-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    letter-spacing: 3px;
+  }
+  .topbar-logo span { color: var(--gold); }
+  .topbar-stats {
+    display: flex; gap: 16px; align-items: center;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 6px 14px;
+    color: var(--white);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat-pill .icon { font-size: 1rem; }
+  #char-avatar-top {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 2px solid var(--gold);
+    font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(245,200,66,0.2);
+  }
+
+  /* ===== WELCOME SCREEN ===== */
+  #screen-welcome {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .welcome-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--white);
+    letter-spacing: 8px;
+    line-height: 1;
+    z-index: 1;
+  }
+  .welcome-logo span { color: var(--gold); }
+  .welcome-sub {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: rgba(255,255,255,0.7);
+    margin: 10px 0 40px;
+    z-index: 1;
+    font-weight: 600;
+  }
+  .eagle-emoji { font-size: 5rem; margin-bottom: 10px; animation: bounce 2s ease-in-out infinite; z-index: 1; }
+  @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);} }
+
+  /* ===== CHARACTER SELECTION ===== */
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 16px;
+    max-width: 700px;
+    width: 100%;
+    z-index: 1;
+  }
+  .char-card {
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 20px 12px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+  }
+  .char-card:hover, .char-card.selected {
+    background: rgba(245,200,66,0.15);
+    border-color: var(--gold);
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 12px 30px rgba(245,200,66,0.3);
+  }
+  .char-emoji { font-size: 2.8rem; display: block; margin-bottom: 8px; }
+  .char-name { color: var(--white); font-weight: 800; font-size: 0.95rem; }
+  .section-title {
+    color: var(--white);
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-weight: 800;
+    margin-bottom: 20px;
+    z-index: 1;
+    opacity: 0.9;
+  }
+
+  /* ===== BTN ===== */
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    border: none; cursor: pointer;
+    border-radius: 14px;
+    padding: 14px 32px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 1;
+    position: relative;
+  }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .btn-gold:hover { background: #ffd84a; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,200,66,0.4); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-sm { padding: 8px 18px; font-size: 0.85rem; border-radius: 10px; }
+
+  /* ===== MAP SCREEN ===== */
+  #screen-map {
+    padding: 0;
+  }
+  .map-content {
+    flex: 1;
+    padding: 24px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+    z-index: 1;
+  }
+  .map-header {
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .map-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+  }
+  .map-header p { color: rgba(255,255,255,0.6); font-size: 0.9rem; font-weight: 600; }
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 10px;
+    margin: 12px 0 24px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #ff9f43);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+
+  .zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .zone-card {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .zone-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .zone-card:hover:not(.locked) {
+    transform: translateY(-4px);
+    border-color: var(--gold);
+    box-shadow: var(--shadow);
+  }
+  .zone-card:hover:not(.locked)::before { opacity: 1; }
+  .zone-card.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .zone-card.completed {
+    border-color: var(--green);
+    background: rgba(46,204,113,0.08);
+  }
+  .zone-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+  .zone-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .zone-desc { color: rgba(255,255,255,0.55); font-size: 0.8rem; font-weight: 600; line-height: 1.4; }
+  .zone-badge {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 0.7rem; font-weight: 800;
+    padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .badge-new { background: var(--gold); color: var(--navy); }
+  .badge-done { background: var(--green); color: white; }
+  .badge-lock { background: rgba(255,255,255,0.15); color: white; }
+  .zone-stars { font-size: 0.9rem; margin-top: 8px; }
+
+  /* ===== GAME SCREEN ===== */
+  #screen-game {
+    padding: 0;
+  }
+  .game-content {
+    flex: 1;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .game-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--white);
+  }
+  .game-zone-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+  .q-progress {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-left: auto;
+  }
+
+  /* Character speech */
+  .char-speech {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .char-face {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    width: 60px; height: 60px;
+    background: rgba(245,200,66,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--gold);
+  }
+  .speech-bubble {
+    background: rgba(0,48,135,0.6);
+    border-radius: 0 16px 16px 16px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.5;
+    flex: 1;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .speech-bubble strong { color: var(--gold); }
+
+  /* Question card */
+  .question-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+  .question-type {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--blue);
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+  .question-text {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.4;
+    margin-bottom: 18px;
+  }
+
+  /* MCQ options */
+  .options-grid {
+    display: grid;
+    gap: 10px;
+  }
+  .option-btn {
+    background: var(--light);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: white;
+    transform: translateX(4px);
+  }
+  .option-btn.correct { background: #d4f5e2; border-color: var(--green); color: #1a7a45; }
+  .option-btn.wrong { background: #ffe0e0; border-color: var(--red); color: #9b1c1c; }
+  .option-btn:disabled { cursor: default; }
+  .option-letter {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: rgba(0,48,135,0.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 900;
+  }
+
+  /* True/False */
+  .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tf-btn {
+    padding: 20px;
+    border-radius: 16px;
+    border: 3px solid transparent;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tf-btn.true-btn { background: #e8f5e9; color: #1b5e20; }
+  .tf-btn.false-btn { background: #fce4ec; color: #880e4f; }
+  .tf-btn:hover:not(:disabled) { transform: scale(1.04); }
+  .tf-btn.correct { border-color: var(--green); }
+  .tf-btn.wrong { border-color: var(--red); }
+
+  /* Fill blank */
+  .fill-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid #dde3f0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--light);
+    margin-bottom: 12px;
+  }
+  .fill-input:focus { border-color: var(--blue); background: white; }
+  .fill-input.correct { border-color: var(--green); background: #d4f5e2; }
+  .fill-input.wrong { border-color: var(--red); background: #ffe0e0; }
+
+  /* Match game */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .match-col { display: flex; flex-direction: column; gap: 8px; }
+  .match-item {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid #dde3f0;
+    background: var(--light);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 44px;
+    display: flex; align-items: center;
+  }
+  .match-item:hover:not(:disabled) { border-color: var(--blue); background: white; }
+  .match-item.selected { border-color: var(--gold); background: rgba(245,200,66,0.15); }
+  .match-item.matched { border-color: var(--green); background: #d4f5e2; opacity: 0.7; cursor: default; }
+  .match-item.wrong-flash { border-color: var(--red); background: #ffe0e0; }
+
+  /* Feedback */
+  .feedback-box {
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .feedback-box.show { display: flex; }
+  .feedback-box.correct { background: #d4f5e2; color: #1a7a45; border: 2px solid #2ecc71; }
+  .feedback-box.wrong { background: #ffe0e0; color: #9b1c1c; border: 2px solid #e74c3c; }
+  .feedback-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+  /* ===== RESULTS SCREEN ===== */
+  #screen-results {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .results-card {
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 28px;
+    padding: 40px 32px;
+    max-width: 480px;
+    width: 100%;
+    z-index: 1;
+  }
+  .results-trophy { font-size: 5rem; animation: bounce 2s ease-in-out infinite; }
+  .results-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    color: var(--white);
+    margin: 12px 0 4px;
+  }
+  .results-score {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--gold);
+    margin: 10px 0;
+  }
+  .results-stars { font-size: 2rem; margin-bottom: 16px; }
+  .results-msg { color: rgba(255,255,255,0.7); font-size: 1rem; font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
+  .results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== GLOSSARY MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--navy);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 28px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .modal-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.2); }
+  .glossary-item {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 12px 0;
+  }
+  .glossary-term { color: var(--gold); font-weight: 800; font-size: 0.95rem; }
+  .glossary-def { color: rgba(255,255,255,0.75); font-size: 0.85rem; margin-top: 4px; line-height: 1.5; }
+
+  /* ===== STREAK ===== */
+  .streak-popup {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 16px;
+    padding: 12px 20px;
+    font-weight: 900;
+    font-size: 1rem;
+    z-index: 300;
+    transform: translateX(200px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 24px rgba(245,200,66,0.5);
+  }
+  .streak-popup.show { transform: translateX(0); }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+  /* ===== ZONE COLORS ===== */
+  .zone-card[data-zone="0"] .zone-icon { filter: drop-shadow(0 0 8px #f5c842); }
+  .zone-card[data-zone="1"] .zone-icon { filter: drop-shadow(0 0 8px #3498db); }
+  .zone-card[data-zone="2"] .zone-icon { filter: drop-shadow(0 0 8px #e74c3c); }
+  .zone-card[data-zone="3"] .zone-icon { filter: drop-shadow(0 0 8px #2ecc71); }
+  .zone-card[data-zone="4"] .zone-icon { filter: drop-shadow(0 0 8px #9b59b6); }
+  .zone-card[data-zone="5"] .zone-icon { filter: drop-shadow(0 0 8px #e67e22); }
+
+  @media (max-width: 480px) {
+    .char-grid { grid-template-columns: repeat(4, 1fr); }
+    .char-name { font-size: 0.7rem; }
+    .char-emoji { font-size: 2rem; }
+    .topbar-stats { gap: 8px; }
+    .stat-pill { padding: 4px 10px; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-deco">
+  <span></span><span></span><span></span>
+</div>
+
+<!-- STREAK POPUP -->
+<div class="streak-popup" id="streak-popup">🔥 ¡Racha x<span id="streak-num">2</span>!</div>
+
+<!-- GLOSSARY MODAL -->
+<div class="modal-overlay" id="glossary-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">📚 Glosario AEO</span>
+      <button class="modal-close" onclick="closeGlossary()">✕</button>
+    </div>
+    <div id="glossary-list"></div>
+  </div>
+</div>
+
+<!-- ======== SCREEN: WELCOME ======== -->
+<div class="screen active" id="screen-welcome">
+  <div class="eagle-emoji" style="z-index:1">🦅</div>
+  <div class="welcome-logo" style="z-index:1">AEO<span> ACADEMY</span></div>
+  <p class="welcome-sub">Brand Voice Training · Aprende jugando</p>
+
+  <p class="section-title">¿Quién eres hoy? 👇</p>
+  <div class="char-grid">
+    <div class="char-card" data-char="paloma" data-emoji="👩‍🦱" onclick="selectChar(this)">
+      <span class="char-emoji">👩‍🦱</span>
+      <span class="char-name">Paloma</span>
+    </div>
+    <div class="char-card" data-char="juanjo" data-emoji="👨‍🦲" onclick="selectChar(this)">
+      <span class="char-emoji">👨‍🦲</span>
+      <span class="char-name">Juanjo</span>
+    </div>
+    <div class="char-card" data-char="stiven" data-emoji="🧑‍🦱" onclick="selectChar(this)">
+      <span class="char-emoji">🧑‍🦱</span>
+      <span class="char-name">Stiven</span>
+    </div>
+    <div class="char-card" data-char="samu" data-emoji="🧑‍🦰" onclick="selectChar(this)">
+      <span class="char-emoji">🧑‍🦰</span>
+      <span class="char-name">Samu</span>
+    </div>
+    <div class="char-card" data-char="chary" data-emoji="👩‍🦳" onclick="selectChar(this)">
+      <span class="char-emoji">👩‍🦳</span>
+      <span class="char-name">Chary</span>
+    </div>
+    <div class="char-card" data-char="xiomi" data-emoji="👩‍🦰" onclick="selectChar(this)">
+      <span class="char-emoji">👩‍🦰</span>
+      <span class="char-name">Xiomi</span>
+    </div>
+    <div class="char-card" data-char="charlie" data-emoji="🧔" onclick="selectChar(this)">
+      <span class="char-emoji">🧔</span>
+      <span class="char-name">Charlie</span>
+    </div>
+    <div class="char-card" data-char="caro" data-emoji="👱‍♀️" onclick="selectChar(this)">
+      <span class="char-emoji">👱‍♀️</span>
+      <span class="char-name">Caro</span>
+    </div>
+  </div>
+  <br>
+  <button class="btn btn-gold" id="start-btn" disabled onclick="startGame()">¡Entrar a la tienda! 🚪</button>
+</div>
+
+<!-- ======== SCREEN: MAP ======== -->
+<div class="screen" id="screen-map">
+  <div class="topbar">
+    <span class="topbar-logo">AEO <span>ACADEMY</span></span>
+    <div class="topbar-stats">
+      <div class="stat-pill"><span class="icon">⭐</span><span id="total-stars">0</span></div>
+      <div class="stat-pill"><span class="icon">💎</span><span id="total-pts">0</span></div>
+      <div id="char-avatar-top"></div>
+    </div>
+  </div>
+
+  <div class="map-content">
+    <div class="map-header">
+      <h2 id="map-greeting">¡Hola, Paloma! 👋</h2>
+      <p>Completa todas las zonas para convertirte en Embajador de Marca</p>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="map-progress" style="width:0%"></div>
+    </div>
+
+    <div class="zones-grid" id="zones-grid"></div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn btn-outline btn-sm" onclick="openGlossary()">📚 Ver Glosario Completo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SCREEN: GAME ======== -->
+<div class="screen" id="screen-game">
+  <div class="topbar">
+    <button class="btn btn-outline btn-sm" onclick="backToMap()">← Mapa</button>
+    <span class="topbar-logo" style="font-size:1.3rem">AEO <span>ACADEMY</span></span>
+    <div class="topbar-stats">
+      <div class="stat-pill"><span class="icon">⭐</span><span id="game-stars">0</span></div>
+      <div class="stat-pill"><span class="icon">💎</span><span id="game-pts">0</span></div>
+    </div>
+  </div>
+
+  <div class="game-content" id="game-content">
+    <!-- Injected dynamically -->
+  </div>
+</div>
+
+<!-- ======== SCREEN: RESULTS ======== -->
+<div class="screen" id="screen-results">
+  <div class="results-card">
+    <div class="results-trophy" id="res-trophy">🏆</div>
+    <div class="results-title" id="res-title">¡Excelente!</div>
+    <div class="results-score" id="res-score">90%</div>
+    <div class="results-stars" id="res-stars">⭐⭐⭐</div>
+    <p class="results-msg" id="res-msg">¡Eres un verdadero Embajador de Marca!</p>
+    <div class="results-actions">
+      <button class="btn btn-outline" onclick="retryZone()">🔄 Reintentar</button>
+      <button class="btn btn-gold" onclick="backToMap()">🗺️ Volver al mapa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const GLOSSARY = [
+  { term: "AEO", def: "American Eagle Outfitters — grupo empresarial con marcas como American Eagle, Aerie y OFFLINE by Aerie, unidos por autenticidad, inclusión y expresión propia." },
+  { term: "Aerie by American Eagle", def: "Marca del grupo AEO enfocada en intimates, comodidad, confianza y conexión real con el cuerpo." },
+  { term: "Apparel Aerie (Ropa Aerie)", def: "Línea de prendas de Aerie: tops, hoodies, bottoms y vestidos para momentos casuales y relajados." },
+  { term: "Arquetipos", def: "Perfiles de clientes: Marca Tendencia (fashionista), En Una Misión (sabe lo que quiere), El Precio es Primero (compara costos) y Explorador (curioso)." },
+  { term: "Bays (Bahías)", def: "Divisiones dentro de la pared (wall) que organizan el producto por categoría, fit, color o historia visual." },
+  { term: "Bra", def: "Prenda interior para el busto. Puede incluir copas, varilla, relleno y distintos niveles de soporte." },
+  { term: "Bralette", def: "Prenda íntima ligera sin estructura rígida, puede usarse como ropa interior o parte visible del outfit." },
+  { term: "BOGO", def: "Buy One Get One: promo donde compras uno y recibes otro gratis o con descuento (BOGO Free / BOGO 50%)." },
+  { term: "Behaviors", def: "Comportamientos clave de la cultura AEO en tienda: Be party ready, Be the customer, Be friends first, Be a hero." },
+  { term: "Bust Forms", def: "Siluetas de tronco usadas en Visual Merchandising para exhibir outfits y combinar productos." },
+  { term: "Camisa Oxford", def: "Camisa en tela Oxford: más gruesa, texturada, resistente y de estilo clásico o casual pulido." },
+  { term: "Camisa Popelina", def: "Camisa en tela popelina: fina, ligera, suave. Apariencia más limpia y formal." },
+  { term: "Carryover", def: "Producto que continúa de una temporada a otra sin cambios en estilo o precio. No genera markdowns." },
+  { term: "Clearance", def: "Área de liquidación con descuento permanente. Sirve para rotar inventario de temporadas pasadas." },
+  { term: "Center Lead", def: "Zona central de la tienda con mesas o exhibidores bajos en medio del recorrido del invitado." },
+  { term: "Counter (Mostrador de caja)", def: "Espacio de pago donde el cajero cobra, recomienda productos y asegura una despedida memorable." },
+  { term: "Customer First", def: "Filosofía de poner al invitado en el centro de cada decisión y acción." },
+  { term: "Crew Neck", def: "Prenda con cuello redondo cerrado, sin solapas ni botones, ajustado a la base del cuello." },
+  { term: "Denim", def: "Tela resistente de algodón usada para jeans y prendas icónicas de la marca." },
+  { term: "Departamentos", def: "Categorías de la tienda: Hombres (10-23), Mujeres (31-43), Aerie/Offline (44-130)." },
+  { term: "Denim Wall", def: "Display especialmente diseñado para mostrar jeans de forma organizada y atractiva." },
+  { term: "Diseños de Tienda", def: "Conceptos arquitectónicos AE: Formato 2012, Be You, Be You+, Lived In. En Aerie: Classic, Modern, Market y Arc." },
+  { term: "Display (Exhibición)", def: "Presentación visual de producto en piso con mesas, estantes y maniquíes según guía de visual merchandising." },
+  { term: "Embajador de Marca", def: "Colaborador que representa y transmite el ADN de American Eagle en cada interacción." },
+  { term: "Fitting Room", def: "Probador: espacio donde los invitados se prueban la ropa antes de comprar." },
+  { term: "Fibras", def: "Hilos básicos de las telas: naturales (algodón), artificiales (viscosa) o sintéticas (poliéster, elastano)." },
+  { term: "Fixture", def: "Mueble fijo de exhibición para accesorios como boxers y medias." },
+  { term: "Floorset (Cambio de piso)", def: "Actualización planificada de exhibiciones para reflejar nuevas colecciones, campañas o temporadas." },
+  { term: "Fit Tag", def: "Etiqueta visual que identifica el tipo de fit/silueta de la prenda para facilitar la asesoría." },
+  { term: "Go-Backs", def: "Prendas probadas o manipuladas pero no compradas. Deben devolverse rápido al piso o bodega." },
+  { term: "Gender Neutral", def: "Prendas diseñadas para ser combinadas y asesoradas tanto para hombres como mujeres, sin etiquetas." },
+  { term: "Guest (Invitado)", def: "La palabra que usamos para referirnos al cliente en AEO/Aerie. Refleja nuestra cultura de hospitalidad." },
+  { term: "Hanger", def: "Gancho o percha para colgar prendas en exhibición." },
+  { term: "Hoodies", def: "Sudaderas con capucha, esenciales en tops. Destacan por comodidad, estilo relajado y versatilidad." },
+  { term: "Layering", def: "Técnica de estilismo: combinar varias capas de prendas para un look más versátil y funcional." },
+  { term: "Lease Line", def: "Estrategia comercial prioritaria del momento que guía la conversación con el invitado y el acomodo del producto." },
+  { term: "LOD (Leader On Duty)", def: "Líder de turno que dirige la operación, asegura estrategia, energía del equipo y experiencia del invitado." },
+  { term: "Maniquí", def: "Figura de exhibición femenina o masculina para mostrar el producto puesto tal como lo vería el invitado." },
+  { term: "Marquee", def: "Espacio visual más importante de la tienda, usualmente en entrada o zona de alto flujo." },
+  { term: "Max Capacity", def: "Estándar visual: la tienda debe mantenerse siempre completamente abastecida." },
+  { term: "Mesa (Table)", def: "Mueble de exhibición horizontal para presentar producto doblado o en display destacado." },
+  { term: "OFFLINE by Aerie", def: "Línea deportiva de Aerie: leggings, tops, shorts, bikers y sudaderas para entrenar o relajarse." },
+  { term: "PAS (Personal Appearance Standards)", def: "Estándares de apariencia personal: estilo moderno, accesorizado y coherente con la esencia AEO/Aerie." },
+  { term: "PPG (Product Placement Guide)", def: "Guía que indica qué productos van dónde y la estrategia de precios por floorset para consistencia visual." },
+  { term: "Preparty", def: "Espacio corto antes de abrir tienda para conectar equipo, alinear estrategias y activar motivación." },
+  { term: "Real Good", def: "Iniciativa de sostenibilidad de American Eagle con materiales y procesos responsables con el medio ambiente." },
+  { term: "Rounders", def: "Mueble exhibidor redondo (metálico) que permite colgar producto en 360° para categorías clave." },
+  { term: "Rule of 3 (Regla de 3)", def: "Estrategia en fitting room: ofrecer la prenda pedida + una alternativa similar + una opción diferente para inspirar." },
+  { term: "Sale", def: "Sección o momento con precios rebajados, incluyendo promociones temporales o artículos en liquidación." },
+  { term: "Season", def: "Período comercial que define la colección activa. Seasons: Spring, Summer, Back to School, Holiday, Sale." },
+  { term: "Selling Model", def: "Forma de aplicar Customer First en 3 pasos: Engage (conectar), Discover (descubrir), Share (recomendar)." },
+  { term: "Sized Dot", def: "Punto adhesivo en prenda o hanger que indica la talla visualmente." },
+  { term: "Sized Wrap", def: "Adhesivo en prendas inferiores que indica talla y largo (waist & length)." },
+  { term: "Shop in Shop", def: "Aerie integrada dentro de una tienda American Eagle, compartiendo fitting y caja." },
+  { term: "Side by Side", def: "Dos tiendas unidas: una entrada Aerie y otra AE, conectadas internamente." },
+  { term: "Stand Alone", def: "Tienda 100% independiente: puede ser solo Aerie o solo American Eagle." },
+  { term: "Storytelling (Visual Merchandising)", def: "Organizar exhibiciones por perfiles: Hombre Classic, Hombre Prep, Mujer Boho, Mujer Prep." },
+  { term: "Soft & Sexy", def: "Categoría de tops del dpto. 37 en AE, elaboradas en telas ultra suaves y ligeras." },
+  { term: "Stack", def: "Forma organizada de apilar producto doblado en mesas o shelves, manteniendo orden y coherencia visual." },
+  { term: "Take Off Training", def: "Inducción a la marca: primer acercamiento con ADN, valores, behaviors y modelo de venta." },
+  { term: "Tejidos", def: "Tipo de construcción de la tela: Tejido plano (woven, firme, sin elasticidad) y Tejido de punto (knit, flexible)." },
+  { term: "Telas", def: "Material resultante de la unión de fibras mediante tejido plano o de punto para confeccionar prendas." },
+  { term: "Top y Bottom", def: "Top = parte superior (camisetas, hoodies). Bottom = parte inferior (jeans, shorts, faldas)." },
+  { term: "Try On", def: "Actividad obligatoria para nuevos colaboradores: probarse los principales fits y estilos de la marca." },
+  { term: "Undies", def: "Ropa interior inferior femenina. Tipos: Thong, Cheeky, Bikini, Boybrief, Boyshort (de menor a mayor cobertura)." },
+  { term: "Upselling", def: "Técnica de venta: ofrecer al invitado una versión superior o de mayor valor del producto que considera." },
+  { term: "Wall (Pared)", def: "Espacio vertical de exhibición organizado y estratégico dentro de la tienda." },
+  { term: "Wardrobers", def: "Mobiliario para venta cruzada y cápsulas de producto. Forma de T o rack simple." },
+  { term: "24/7 by American Eagle", def: "Colección deportiva AE: versatilidad, comodidad y transpirabilidad del sofá a la cancha." },
+  { term: "5S", def: "Estándares visuales: Stock (producto disponible), Size (tallas organizadas), Signed (señalización), Standard (alineación marca), Styled (exhibición con intención)." },
+];
+
+const ZONES = [
+  {
+    id: 0,
+    icon: "🏢",
+    title: "La Empresa AEO",
+    desc: "Conoce el ADN, marcas y filosofía de AEO",
+    color: "#f5c842",
+    questions: [
+      {
+        type: "mcq",
+        q: "¿Qué significa AEO?",
+        opts: ["American Eagle Outfitters", "Aerie Eagle Organization", "Advanced Eagle Operations", "American Exclusive Outerwear"],
+        correct: 0,
+        explanation: "AEO = American Eagle Outfitters, el grupo empresarial que engloba American Eagle, Aerie y OFFLINE by Aerie."
+      },
+      {
+        type: "tf",
+        q: "Aerie by American Eagle es una marca enfocada en ropa deportiva de alto rendimiento.",
+        correct: false,
+        explanation: "Falso. Aerie se enfoca en intimates: comodidad, confianza y una conexión real con el cuerpo."
+      },
+      {
+        type: "mcq",
+        q: "¿Cuál de estos valores NO es parte de la visión de AEO?",
+        opts: ["Autenticidad", "Competitividad extrema", "Inclusión", "Expresión de estilo propio"],
+        correct: 1,
+        explanation: "AEO se guía por autenticidad, inclusión y expresión de estilo propio, no por competitividad extrema."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es un 'Guest' en AEO?",
+        opts: ["Un empleado nuevo", "El cliente de la tienda", "Un proveedor", "Un visual merchandiser"],
+        correct: 1,
+        explanation: "Guest = Invitado. Así llamamos al cliente en AEO/Aerie, reflejando nuestra cultura de hospitalidad."
+      },
+      {
+        type: "tf",
+        q: "OFFLINE by Aerie es una línea enfocada en ropa para actividad física.",
+        correct: true,
+        explanation: "Correcto. OFFLINE by Aerie incluye leggings, tops deportivos, shorts y bikers para entrenar o relajarse."
+      },
+      {
+        type: "mcq",
+        q: "La filosofía 'Customer First' significa:",
+        opts: ["El cliente siempre tiene razón", "Poner al invitado en el centro de cada decisión", "Atender primero a los clientes frecuentes", "Dar descuentos prioritarios"],
+        correct: 1,
+        explanation: "Customer First = poner al invitado en el centro de todo. Es la base de nuestra cultura de servicio."
+      },
+    ]
+  },
+  {
+    id: 1,
+    icon: "👕",
+    title: "Productos & Prendas",
+    desc: "Tops, bottoms, denim y más vocabulario de producto",
+    color: "#3498db",
+    questions: [
+      {
+        type: "mcq",
+        q: "¿Qué es un 'Bra'?",
+        opts: ["Un tipo de jean", "Una prenda interior para soporte del busto", "Una camiseta sin mangas", "Un accesorio de cuello"],
+        correct: 1,
+        explanation: "Un Bra es la prenda interior diseñada para soporte del busto, con copas, varilla o relleno."
+      },
+      {
+        type: "tf",
+        q: "Una 'Bralette' es una prenda con estructura rígida y varilla.",
+        correct: false,
+        explanation: "Falso. La Bralette es ligera y SIN estructura rígida. Por eso puede usarse como ropa interior o parte del outfit."
+      },
+      {
+        type: "mcq",
+        q: "Los 'Hoodies' son:",
+        opts: ["Pantalones con bolsillos", "Sudaderas con capucha", "Blusas de seda", "Jeans de tiro alto"],
+        correct: 1,
+        explanation: "Hoodies = sudaderas (buzos) con capucha. Son esenciales en la categoría de tops por su comodidad y versatilidad."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué diferencia a la Camisa Oxford de la Popelina?",
+        opts: ["La Oxford es más fina y formal", "La Oxford es más gruesa y texturada", "Son exactamente iguales", "La Popelina es más gruesa"],
+        correct: 1,
+        explanation: "Oxford = tejido más grueso, texturado, estilo clásico/casual pulido. Popelina = más fina, ligera, suave y formal."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué tipo de ropa incluye la categoría 'Undies'?",
+        opts: ["Ropa exterior femenina", "Ropa interior inferior femenina", "Ropa de hombre", "Accesorios"],
+        correct: 1,
+        explanation: "Undies = ropa interior inferior femenina. Tipos: Thong, Cheeky, Bikini, Boybrief y Boyshort."
+      },
+      {
+        type: "mcq",
+        q: "¿Cuál es el estilo de Undies con MAYOR cobertura?",
+        opts: ["Thong", "Cheeky", "Bikini", "Boyshort"],
+        correct: 3,
+        explanation: "Boyshort = la más cubierta, con corte recto y amplia cobertura frontal y posterior. Thong tiene la mínima cobertura."
+      },
+      {
+        type: "tf",
+        q: "El Denim es una tela flexible y elástica por su construcción en bucles.",
+        correct: false,
+        explanation: "Falso. Denim es un tejido PLANO (woven): firme y sin elasticidad natural. Los tejidos elásticos son los de punto (knit)."
+      },
+    ]
+  },
+  {
+    id: 2,
+    icon: "🏪",
+    title: "Visual Merchandising",
+    desc: "Displays, walls, floorsets y exhibición en piso",
+    color: "#e74c3c",
+    questions: [
+      {
+        type: "mcq",
+        q: "¿Qué es un 'Floorset' o cambio de piso?",
+        opts: ["Limpiar el piso de la tienda", "Actualización planificada de exhibiciones para nuevas colecciones", "Reubicar la caja registradora", "Cambiar las luces de la tienda"],
+        correct: 1,
+        explanation: "Floorset = actualización planificada de exhibiciones que refleja nuevas colecciones, campañas o temporadas. ¡Es cómo traemos el ADN de marca a la vida!"
+      },
+      {
+        type: "mcq",
+        q: "¿Dónde se ubica el 'Marquee' de la tienda?",
+        opts: ["En la bodega", "En el probador", "En la entrada o zona de alto flujo", "Detrás de la caja"],
+        correct: 2,
+        explanation: "Marquee = el espacio visual más importante de la tienda. Generalmente en la entrada o zona de alto flujo."
+      },
+      {
+        type: "tf",
+        q: "Los 'Bays' son los muebles redondos que se usan para colgar producto en 360°.",
+        correct: false,
+        explanation: "Falso. Los Bays son divisiones dentro de la pared (wall). Los muebles redondos se llaman ROUNDERS."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué significa 'Max Capacity' en tienda?",
+        opts: ["El máximo de personas permitidas en el fitting room", "La tienda siempre completamente abastecida según guía de marca", "El límite de productos en caja", "El número máximo de maniquíes"],
+        correct: 1,
+        explanation: "Max Capacity = estándar visual que indica que mesas, muros y exhibiciones deben mantenerse siempre llenos."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué son los '5S' en AEO?",
+        opts: ["5 pasos de venta", "5 estándares visuales: Stock, Size, Signed, Standard, Styled", "5 tipos de tejido", "5 comportamientos del equipo"],
+        correct: 1,
+        explanation: "5S = Stock (producto disponible), Size (tallas organizadas), Signed (señalización), Standard (alineación marca), Styled (exhibición con intención)."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es un 'Rounder'?",
+        opts: ["Una mesa circular", "Un mueble redondo para colgar producto en 360°", "Un tipo de display de pared", "Una figura de maniquí circular"],
+        correct: 1,
+        explanation: "Rounder = mueble exhibidor redondo metálico que permite colgar producto alrededor en 360°. Ideal para categorías clave y lanzamientos."
+      },
+      {
+        type: "tf",
+        q: "Los 'Go-Backs' son prendas que el invitado compró y devolvió.",
+        correct: false,
+        explanation: "Falso. Go-Backs son prendas que el invitado LLEVÓ al fitting room o manipuló pero NO compró. Deben volver rápido al piso."
+      },
+    ]
+  },
+  {
+    id: 3,
+    icon: "💰",
+    title: "Ventas & Promociones",
+    desc: "BOGO, Sale, upselling y técnicas de venta",
+    color: "#2ecc71",
+    questions: [
+      {
+        type: "mcq",
+        q: "BOGO 50% significa:",
+        opts: ["Descuento del 50% en toda la tienda", "Compra uno y el segundo al 50%", "Compra dos y lleva uno gratis", "50% de descuento solo en Sale"],
+        correct: 1,
+        explanation: "BOGO 50% = Buy One Get One al 50%. Compras uno a precio regular y el segundo tiene 50% de descuento."
+      },
+      {
+        type: "tf",
+        q: "El 'Clearance' es una zona de productos de nueva colección.",
+        correct: false,
+        explanation: "Falso. Clearance = área de descuento PERMANENTE o liquidación para rotar inventario de temporadas PASADAS."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es el 'Upselling'?",
+        opts: ["Vender accesorios adicionales", "Ofrecer una versión superior del producto que considera el cliente", "Dar descuentos para cerrar la venta", "Mostrar la sección de Sale"],
+        correct: 1,
+        explanation: "Upselling = técnica de venta que ofrece una versión superior o de mayor valor resaltando sus beneficios adicionales."
+      },
+      {
+        type: "mcq",
+        q: "El 'Selling Model' de AEO tiene 3 pasos. ¿Cuál es el orden correcto?",
+        opts: ["Share, Discover, Engage", "Discover, Share, Engage", "Engage, Discover, Share", "Share, Engage, Discover"],
+        correct: 2,
+        explanation: "Engage (conectar con saludo auténtico) → Discover (preguntar y escuchar) → Share (recomendar y ofrecer looks). ¡Así aplicamos Customer First!"
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es el PPG?",
+        opts: ["Plan de Pagos Graduales", "Product Placement Guide: guía de colocación de productos", "Protocolo de Personal Gerencial", "Programa de Puntos Gold"],
+        correct: 1,
+        explanation: "PPG = Product Placement Guide: indica qué productos van, cómo y con qué estrategia de precios por floorset, asegurando consistencia visual."
+      },
+      {
+        type: "tf",
+        q: "La 'Rule of 3' consiste en dar 3 descuentos diferentes al invitado en el fitting room.",
+        correct: false,
+        explanation: "Falso. Rule of 3 = ofrecer 3 OPCIONES de prendas: la solicitada, una alternativa similar y una opción diferente para inspirar."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es un producto 'Carryover'?",
+        opts: ["Producto devuelto por el cliente", "Producto que continúa de temporada a temporada sin cambios", "Producto traído de otro país", "Producto de descuento continuo"],
+        correct: 1,
+        explanation: "Carryover = producto que se mantiene de una temporada a otra sin cambios en estilo o precio. Ayuda a conservar surtido sin generar markdowns."
+      },
+    ]
+  },
+  {
+    id: 4,
+    icon: "👥",
+    title: "Cultura & Equipo",
+    desc: "Behaviors, roles, Preparty y ADN de marca",
+    color: "#9b59b6",
+    questions: [
+      {
+        type: "mcq",
+        q: "¿Cuáles son los 4 Behaviors de AEO?",
+        opts: [
+          "Be on time, Be clean, Be efficient, Be nice",
+          "Be party ready, Be the customer, Be friends first, Be a hero",
+          "Be fast, Be smart, Be loyal, Be profitable",
+          "Be trendy, Be vocal, Be social, Be digital"
+        ],
+        correct: 1,
+        explanation: "Los 4 Behaviors: Be party ready (sé dispuesto), Be the customer (sé un cliente), Be friends first (sé un amigo), Be a hero (sé un héroe)."
+      },
+      {
+        type: "tf",
+        q: "El LOD (Leader on Duty) solo se encarga de abrir y cerrar la tienda.",
+        correct: false,
+        explanation: "Falso. El LOD dirige TODA la operación del turno: estrategia, energía del equipo, foco comercial Y experiencia del invitado."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es el 'Preparty'?",
+        opts: ["Fiesta de fin de año del equipo", "Espacio corto antes de abrir para alinear estrategias y motivar al equipo", "Preparación de producto nuevo", "Reunión mensual de resultados"],
+        correct: 1,
+        explanation: "Preparty = espacio corto previo a la jornada donde el equipo se conecta, alinea estrategias y activa motivación. ¡La energía del día empieza aquí!"
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es el 'Take Off Training'?",
+        opts: ["Entrenamiento de cajeros", "Primera inducción a la marca: ADN, valores, behaviors y modelo de venta", "Capacitación en visual merchandising", "Curso de manejo de inventario"],
+        correct: 1,
+        explanation: "Take Off Training = primer acercamiento del nuevo colaborador a la marca. Aprende el ADN, valores, behaviors y fundamentos del modelo de venta."
+      },
+      {
+        type: "mcq",
+        q: "¿Cuál es el arquetipo de cliente que prioriza el costo y siempre compara precios?",
+        opts: ["Marca Tendencia", "En Una Misión", "El Precio es Primero", "Explorador"],
+        correct: 2,
+        explanation: "El Precio es Primero = arquetipo que prioriza el valor y el costo, siempre compara antes de decidir. ¡Conocer el arquetipo ayuda a personalizar la asesoría!"
+      },
+      {
+        type: "tf",
+        q: "El 'Try On' es opcional para los colaboradores nuevos.",
+        correct: false,
+        explanation: "Falso. El Try On es OBLIGATORIO para todos los nuevos colaboradores. Deben probarse los principales fits y estilos para poder asesorar mejor al invitado."
+      },
+    ]
+  },
+  {
+    id: 5,
+    icon: "🗂️",
+    title: "Formatos & Estructura",
+    desc: "Tipos de tienda, departamentos y diseños",
+    color: "#e67e22",
+    questions: [
+      {
+        type: "mcq",
+        q: "En un formato 'Shop in Shop', ¿qué ocurre?",
+        opts: ["Aerie y AE son tiendas completamente separadas", "Aerie está integrada DENTRO de una tienda American Eagle", "Ambas marcas comparten solo el almacén", "Es una tienda solo de Aerie"],
+        correct: 1,
+        explanation: "Shop in Shop = Aerie integrada dentro de AE, compartiendo fitting y caja. No es un espacio independiente."
+      },
+      {
+        type: "mcq",
+        q: "¿Cómo se llama la tienda que tiene una entrada Aerie y otra AE, conectadas internamente?",
+        opts: ["Shop in Shop", "Stand Alone", "Side by Side", "Dual Store"],
+        correct: 2,
+        explanation: "Side by Side = dos tiendas unidas: una entrada Aerie y otra AE, conectadas internamente."
+      },
+      {
+        type: "mcq",
+        q: "Los departamentos de Hombres en AEO van del número:",
+        opts: ["1 al 9", "10 al 23", "31 al 43", "44 al 130"],
+        correct: 1,
+        explanation: "Departamentos: Hombres (10-23), Mujeres (31-43), Aerie/OFFLINE (44-130)."
+      },
+      {
+        type: "tf",
+        q: "El formato 'Lived In' es exclusivo de las tiendas Aerie.",
+        correct: false,
+        explanation: "Falso. Los diseños de tienda AE son: Formato 2012, Be You, Be You+ y Lived In. En Aerie son: Classic, Modern, Market y Arc."
+      },
+      {
+        type: "mcq",
+        q: "¿Cuáles son las principales 'Seasons' o temporadas de AEO?",
+        opts: ["Otoño, Invierno, Primavera, Verano", "Spring, Summer, Back to School, Holiday y Sale", "Colección 1, Colección 2, Colección 3", "Básicos, Tendencia, Temporada Alta"],
+        correct: 1,
+        explanation: "Las 5 seasons principales: Spring (Primavera), Summer (Verano), Back to School (Regreso a clases), Holiday (Temporada festiva) y Sale (Descuentos)."
+      },
+      {
+        type: "mcq",
+        q: "¿Qué es el 'Storytelling' en Visual Merchandising de AEO?",
+        opts: ["Narrar el origen de la marca a los clientes", "Organizar exhibiciones según perfiles: Classic, Prep, Boho", "Contar historias en el fitting room", "Decorar con frases motivadoras"],
+        correct: 1,
+        explanation: "Storytelling VM = organizar exhibiciones según perfiles: Hombre Classic (atemporal), Hombre Prep (tendencia), Mujer Boho (femenina-relajada), Mujer Prep (fashion)."
+      },
+    ]
+  },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  charName: '',
+  charEmoji: '',
+  totalPoints: 0,
+  totalStars: 0,
+  completedZones: {},
+  currentZone: null,
+  currentQ: 0,
+  correctCount: 0,
+  streak: 0,
+  matchState: { selected: null, pairs: [] },
+};
+
+// ============================================================
+// WELCOME
+// ============================================================
+function selectChar(el) {
+  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.charName = el.dataset.char.charAt(0).toUpperCase() + el.dataset.char.slice(1);
+  state.charEmoji = el.dataset.emoji;
+  document.getElementById('start-btn').disabled = false;
+}
+
+function startGame() {
+  if (!state.charName) return;
+  showScreen('screen-map');
+  renderMap();
+}
+
+// ============================================================
+// MAP
+// ============================================================
+function renderMap() {
+  document.getElementById('map-greeting').textContent = `¡Hola, ${state.charName}! 👋`;
+  document.getElementById('char-avatar-top').textContent = state.charEmoji;
+  document.getElementById('total-stars').textContent = state.totalStars;
+  document.getElementById('total-pts').textContent = state.totalPoints;
+
+  const completed = Object.keys(state.completedZones).length;
+  const pct = Math.round((completed / ZONES.length) * 100);
+  document.getElementById('map-progress').style.width = pct + '%';
+
+  const grid = document.getElementById('zones-grid');
+  grid.innerHTML = '';
+  ZONES.forEach((zone, i) => {
+    const isDone = !!state.completedZones[zone.id];
+    const isLocked = i > 0 && !state.completedZones[ZONES[i-1].id];
+    const stars = state.completedZones[zone.id]?.stars || 0;
+
+    const card = document.createElement('div');
+    card.className = `zone-card${isDone ? ' completed' : ''}${isLocked ? ' locked' : ''}`;
+    card.dataset.zone = i;
+    card.innerHTML = `
+      <span class="zone-icon">${zone.icon}</span>
+      <div class="zone-title">${zone.title}</div>
+      <div class="zone-desc">${zone.desc}</div>
+      <div class="zone-stars">${isDone ? '⭐'.repeat(stars) + '☆'.repeat(3-stars) : isLocked ? '🔒 Completa la anterior' : '☆☆☆'}</div>
+      <span class="zone-badge ${isDone ? 'badge-done' : isLocked ? 'badge-lock' : 'badge-new'}">${isDone ? '✓ Completada' : isLocked ? 'Bloqueada' : 'Jugar'}</span>
+    `;
+    if (!isLocked) card.onclick = () => startZone(zone.id);
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// GAME
+// ============================================================
+function startZone(zoneId) {
+  state.currentZone = zoneId;
+  state.currentQ = 0;
+  state.correctCount = 0;
+  state.streak = 0;
+  showScreen('screen-game');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const zone = ZONES[state.currentZone];
+  const q = zone.questions[state.currentQ];
+  const total = zone.questions.length;
+
+  document.getElementById('game-stars').textContent = state.totalStars;
+  document.getElementById('game-pts').textContent = state.totalPoints;
+
+  const content = document.getElementById('game-content');
+  content.innerHTML = '';
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'game-header';
+  header.innerHTML = `
+    <span style="font-size:1.8rem">${zone.icon}</span>
+    <span class="game-zone-title">${zone.title}</span>
+    <span class="q-progress">Pregunta ${state.currentQ + 1} de ${total}</span>
+  `;
+  content.appendChild(header);
+
+  // Character speech
+  const speeches = [
+    `¡Vamos, <strong>${state.charName}</strong>! Esta es la pregunta <strong>${state.currentQ + 1}</strong>. ¡Tú puedes! 💪`,
+    `<strong>¡Ojo!</strong> Esta información es clave para brillar en tienda, <strong>${state.charName}</strong>. 🦅`,
+    `Recuerda que cada pregunta te acerca a ser un <strong>Embajador de Marca</strong>. ¡Dale! ⭐`,
+    `<strong>¡Concéntrate!</strong> Si aciertas, ganas puntos y subes tu racha. 🔥`,
+    `¿Listo, <strong>${state.charName}</strong>? El invitado te va a agradecer saber esto. 🛍️`,
+  ];
+  const speech = document.createElement('div');
+  speech.className = 'char-speech';
+  speech.innerHTML = `
+    <div class="char-face">${state.charEmoji}</div>
+    <div class="speech-bubble">${speeches[state.currentQ % speeches.length]}</div>
+  `;
+  content.appendChild(speech);
+
+  // Question card
+  const card = document.createElement('div');
+  card.className = 'question-card';
+
+  if (q.type === 'mcq') {
+    card.innerHTML = `
+      <div class="question-type">Selección múltiple</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options-grid" id="opts"></div>
+    `;
+    content.appendChild(card);
+    const opts = document.getElementById('opts');
+    const letters = ['A', 'B', 'C', 'D'];
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = `<span class="option-letter">${letters[i]}</span> ${opt}`;
+      btn.onclick = () => answerMCQ(i, q.correct, q.explanation);
+      opts.appendChild(btn);
+    });
+  } else if (q.type === 'tf') {
+    card.innerHTML = `
+      <div class="question-type">Verdadero o Falso</div>
+      <div class="question-text">${q.q}</div>
+      <div class="tf-grid">
+        <button class="tf-btn true-btn" onclick="answerTF(true, ${q.correct}, '${encodeURIComponent(q.explanation)}')">✅ VERDADERO</button>
+        <button class="tf-btn false-btn" onclick="answerTF(false, ${q.correct}, '${encodeURIComponent(q.explanation)}')">❌ FALSO</button>
+      </div>
+    `;
+    content.appendChild(card);
+  }
+
+  // Feedback box
+  const fb = document.createElement('div');
+  fb.className = 'feedback-box';
+  fb.id = 'feedback-box';
+  fb.innerHTML = `<span class="feedback-icon"></span><span id="feedback-text"></span>`;
+  content.appendChild(fb);
+
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn btn-gold';
+  nextBtn.id = 'next-btn';
+  nextBtn.style.display = 'none';
+  nextBtn.style.alignSelf = 'flex-end';
+  nextBtn.textContent = state.currentQ + 1 < total ? '¡Siguiente! →' : '¡Ver resultados! 🏆';
+  nextBtn.onclick = () => nextQuestion();
+  content.appendChild(nextBtn);
+}
+
+function showFeedback(correct, explanation) {
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box show ' + (correct ? 'correct' : 'wrong');
+  fb.querySelector('.feedback-icon').textContent = correct ? '✅' : '❌';
+  document.getElementById('feedback-text').innerHTML = `<strong>${correct ? '¡Correcto!' : 'Incorrecto.'}</strong> ${explanation}`;
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function answerMCQ(chosen, correct, explanation) {
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  const btns = document.querySelectorAll('.option-btn');
+  btns[chosen].classList.add(chosen === correct ? 'correct' : 'wrong');
+  if (chosen !== correct) btns[correct].classList.add('correct');
+  handleAnswer(chosen === correct, explanation);
+}
+
+function answerTF(chosen, correct, explanation) {
+  const decodedExp = decodeURIComponent(explanation);
+  document.querySelectorAll('.tf-btn').forEach(b => b.disabled = true);
+  const isCorrect = chosen === correct;
+  if (isCorrect) {
+    (chosen ? document.querySelector('.true-btn') : document.querySelector('.false-btn')).classList.add('correct');
+  } else {
+    (chosen ? document.querySelector('.true-btn') : document.querySelector('.false-btn')).classList.add('wrong');
+    (!chosen ? document.querySelector('.true-btn') : document.querySelector('.false-btn')).classList.add('correct');
+  }
+  handleAnswer(isCorrect, decodedExp);
+}
+
+function handleAnswer(isCorrect, explanation) {
+  if (isCorrect) {
+    state.correctCount++;
+    state.streak++;
+    const pts = 100 + (state.streak > 1 ? (state.streak - 1) * 20 : 0);
+    state.totalPoints += pts;
+    if (state.streak >= 2) showStreakPopup();
+  } else {
+    state.streak = 0;
+  }
+  document.getElementById('game-stars').textContent = state.totalStars;
+  document.getElementById('game-pts').textContent = state.totalPoints;
+  showFeedback(isCorrect, explanation);
+}
+
+function showStreakPopup() {
+  const popup = document.getElementById('streak-popup');
+  document.getElementById('streak-num').textContent = state.streak;
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 2500);
+}
+
+function nextQuestion() {
+  const zone = ZONES[state.currentZone];
+  state.currentQ++;
+  if (state.currentQ >= zone.questions.length) {
+    finishZone();
+  } else {
+    renderQuestion();
+  }
+}
+
+function finishZone() {
+  const zone = ZONES[state.currentZone];
+  const total = zone.questions.length;
+  const pct = Math.round((state.correctCount / total) * 100);
+  let stars = pct >= 90 ? 3 : pct >= 65 ? 2 : pct >= 40 ? 1 : 0;
+
+  // Save best
+  const prev = state.completedZones[state.currentZone];
+  if (!prev || prev.stars < stars) {
+    state.completedZones[state.currentZone] = { stars };
+    state.totalStars = Object.values(state.completedZones).reduce((a, z) => a + z.stars, 0);
+  }
+
+  showScreen('screen-results');
+  const trophy = pct >= 90 ? '🏆' : pct >= 65 ? '🥈' : pct >= 40 ? '🥉' : '😅';
+  const title = pct >= 90 ? '¡Excelente!' : pct >= 65 ? '¡Muy bien!' : pct >= 40 ? '¡Buen intento!' : '¡Sigue practicando!';
+  const msgs = {
+    3: `¡Eres un auténtico Embajador de Marca, ${state.charName}! AEO está orgulloso de ti. 🦅`,
+    2: `¡Gran trabajo, ${state.charName}! Repasa un par de términos y vas a tener las 3 estrellas. 💪`,
+    1: `Buen comienzo, ${state.charName}. El conocimiento llega con la práctica. ¡Inténtalo de nuevo! 📚`,
+    0: `¡Ánimo, ${state.charName}! Revisa el glosario y vuelve a intentarlo. ¡Tú puedes! 🙌`,
+  };
+
+  document.getElementById('res-trophy').textContent = trophy;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-score').textContent = pct + '%';
+  document.getElementById('res-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+  document.getElementById('res-msg').textContent = msgs[stars];
+}
+
+function retryZone() {
+  startZone(state.currentZone);
+}
+
+function backToMap() {
+  showScreen('screen-map');
+  renderMap();
+}
+
+// ============================================================
+// GLOSSARY
+// ============================================================
+function openGlossary() {
+  const list = document.getElementById('glossary-list');
+  list.innerHTML = GLOSSARY.map(g => `
+    <div class="glossary-item">
+      <div class="glossary-term">${g.term}</div>
+      <div class="glossary-def">${g.def}</div>
+    </div>
+  `).join('');
+  document.getElementById('glossary-modal').classList.add('show');
+}
+function closeGlossary() {
+  document.getElementById('glossary-modal').classList.remove('show');
+}
+document.getElementById('glossary-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('glossary-modal')) closeGlossary();
+});
+
+// ============================================================
+// UTILS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
